@@ -59,7 +59,7 @@ node {
 
                 
         stage('Push To Test Scratch Org') {
-              rc = bat returnStatus: true, script: "\"${toolbelt}\" force:source:push --targetusername avinesh17@force.com"
+              rc = bat returnStatus: true, script: "\"${toolbelt}\" force:source:push "
               println(rc)
               if (rc != 0) {
               error 'Salesforce push to test scratch org failed.'
