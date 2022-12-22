@@ -24,9 +24,10 @@ node {
         // when running in multi-branch job, one must issue this command
         checkout scm
     }
+	withCredentials([file(credentialsId: SERVER_KEY_CREDENTALS_ID, variable: 'server_key_file')]) {
 		
 		stage('Authorize DevHub') {   
-    rc = command "${toolbelt}/sfdx auth:jwt:grant --instanceurl ${SFDC_HOST_DH} --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} --username ${HUB_ORG_DH} --jwtkeyfile ${JWT_CRED_ID_DH} --setdefaultdevhubusername"
+    rc = command "${toolbelt}/sfdx auth:jwt:grant --instanceurl ${SFDC_HOST_DH} --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} --username ${HUB_ORG_DH} --jwtkeyfile ${server_key_file} --setdefaultdevhubusername"
     if (rc != 0) {
         error 'Salesforce dev hub org authorization failed.'
     }
@@ -66,4 +67,5 @@ node {
             rc = sh returnStatus: true, script: "\"${toolbelt}\" force:user:permset:assign --targetusername ${SFDC_USERNAME} --permsetname purealoe"
             if (rc != 0) { error 'permset:assign failed'}
         }
+}
 }
