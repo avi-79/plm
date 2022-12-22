@@ -14,7 +14,10 @@ node {
     
 
     def toolbelt = tool 'toolbelt'
-
+ stage('Checkout Source') {
+        // when running in multi-branch job, one must issue this command
+        checkout scm
+    }
 	
     	stage('Authenticate Devhub') {
             bat "sfdx force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} \
