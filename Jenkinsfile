@@ -5,7 +5,7 @@ node {
     def BUILD_NUMBER=env.BUILD_NUMBER
     def RUN_ARTIFACT_DIR="tests/${BUILD_NUMBER}"
     def SFDC_USERNAME
-    def alias="test"
+    def alias="test2"
     def HUB_ORG=env.HUB_ORG_DH
     def SFDC_HOST = env.SFDC_HOST_DH
     def JWT_KEY_CRED_ID = env.JWT_CRED_ID_DH
@@ -59,7 +59,7 @@ node {
 
                 
         stage('Push To Test Scratch Org') {
-              rc = bat returnStatus: true, script: "\"${toolbelt}\" force:source:push -u avinesh1"
+              rc = bat returnStatus: true, script: "\"${toolbelt}\" force:source:push --targetusername ${alias}"
               println(rc)
               if (rc != 0) {
               error 'Salesforce push to test scratch org failed.'
