@@ -26,7 +26,7 @@ node {
   -Dsonar.projectKey=salesforce-DX \
   -Dsonar.sources=. \
   -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.login=a1e738c7b01ce1df11e6cf8e31308ac4b1287f32"
+  -Dsonar.login=jenkins-sonar"
  }
 	
     	stage('Authenticate Devhub') {
