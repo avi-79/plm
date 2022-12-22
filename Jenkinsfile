@@ -36,7 +36,7 @@ node {
 	withCredentials([file(credentialsId: JWT_CRED_ID_DH, variable: 'server_key_file')]) {
 		
 		stage('Authorize DevHub') {   
-    rc = command "${toolbelt} auth:jwt:grant --instanceurl ${SFDC_HOST_DH} --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} --username ${HUB_ORG_DH} --jwtkeyfile ${JWT_CRED_ID_DH} --setdefaultdevhubusername"
+     rc = bat returnStatus: true, script: "\"${toolbelt}\" auth:jwt:grant --instanceurl ${SFDC_HOST_DH} --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} --username ${HUB_ORG_DH} --jwtkeyfile ${JWT_CRED_ID_DH} --setdefaultdevhubusername"
     if (rc != 0) {
         error 'Salesforce dev hub org authorization failed.'
     }
@@ -45,7 +45,7 @@ node {
   
 		
 		stage('Create Test Scratch Org') {
-    rc = command "${toolbelt}/sfdx force:org:create --targetdevhubusername HubOrg --setdefaultusername --definitionfile config/project-scratch-def.json --setalias ciorg --wait 10 --durationdays 1"
+    rc = bat "${toolbelt}/sfdx force:org:create --targetdevhubusername HubOrg --setdefaultusername --definitionfile config/project-scratch-def.json --setalias ciorg --wait 10 --durationdays 1"
     println(rmsg)
             def jsonSlurper = new JsonSlurperClassic()
             def robj = jsonSlurper.parseText(rmsg)
@@ -61,7 +61,7 @@ node {
         }
 
         stage('Create password for scratch org') {
- 			rc = command returnStdout: true, script: "\"${toolbelt}\" force:user:password:generate --json"
+ 			rc = bat returnStdout: true, script: "\"${toolbelt}\" force:user:password:generate --json"
 			println(rmsg)
 			def jsonSlurper = new JsonSlurperClassic()
 			def robj = jsonSlurper.parseText(rmsg)
@@ -70,7 +70,7 @@ node {
         }
 	
         stage('Push To Scratch Org') {
-            rc = command returnStatus: true, script: "\"${toolbelt}\" force:source:push --targetusername ${SFDC_USERNAME}"
+            rc = bat returnStatus: true, script: "\"${toolbelt}\" force:source:push --targetusername ${SFDC_USERNAME}"
             if (rc != 0) { error 'Push failed'}	
             // assign permset
             rc = sh returnStatus: true, script: "\"${toolbelt}\" force:user:permset:assign --targetusername ${SFDC_USERNAME} --permsetname purealoe"
@@ -79,10 +79,3 @@ node {
 }
 }
 
-def command(script) {
-    if (isUnix()) {
-        return sh(returnStatus: true, script: script);
-    } else {
-        return bat(returnStatus: true, script: script);
-    }
-}
