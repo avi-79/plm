@@ -36,7 +36,7 @@ node {
 	withCredentials([file(credentialsId: JWT_CRED_ID_DH, variable: 'server_key_file')]) {
 		
 		stage('Authorize DevHub') {   
-    rc = command "${toolbelt}/sfdx auth:jwt:grant --instanceurl ${SFDC_HOST_DH} --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} --username ${HUB_ORG_DH} --jwtkeyfile ${JWT_CRED_ID_DH} --setdefaultdevhubusername"
+    rc = command "${toolbelt} auth:jwt:grant --instanceurl ${SFDC_HOST_DH} --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} --username ${HUB_ORG_DH} --jwtkeyfile ${JWT_CRED_ID_DH} --setdefaultdevhubusername"
     if (rc != 0) {
         error 'Salesforce dev hub org authorization failed.'
     }
