@@ -22,7 +22,7 @@ node {
 	
  stage('Souce Code Analysis'){
 	 
- bat "sonar-scanner \
+ bat "sonar-scanner.bat \
   -Dsonar.projectKey=salesforce-DX \
   -Dsonar.sources=. \
   -Dsonar.host.url=http://localhost:9000 \
