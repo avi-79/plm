@@ -20,14 +20,14 @@ node {
         checkout scm
     }
 	
- stage('Souce Code Analysis'){
+ #stage('Souce Code Analysis'){
 	 
- bat "sonar-scanner.bat \
-  -Dsonar.projectKey=salesforce-DX \
-  -Dsonar.sources=. \
-  -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.login=jenkins-sonar"
- }
+# bat "sonar-scanner.bat \
+ # -Dsonar.projectKey=salesforce-DX \
+  #-Dsonar.sources=. \
+  #-Dsonar.host.url=http://localhost:9000 \
+  #-Dsonar.login=jenkins-sonar"
+ #}
 	
     	stage('Authenticate Devhub') {
             bat "sfdx force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} \
