@@ -23,11 +23,20 @@ node {
  stage('Checkout Source') {
         // when running in multi-branch job, one must issue this command
         checkout scm
+		
     }
+ stage('Souce Code Analysis'){
+	 
+ rc=command "sonar-scanner \
+  -Dsonar.projectKey=salesforce-DX \
+  -Dsonar.sources=. \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=a1e738c7b01ce1df11e6cf8e31308ac4b1287f32"
+ }	
 	withCredentials([file(credentialsId: JWT_CRED_ID_DH, variable: 'server_key_file')]) {
 		
 		stage('Authorize DevHub') {   
-    rc = command "${toolbelt}/sfdx auth:jwt:grant --instanceurl ${SFDC_HOST_DH} --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} --username ${HUB_ORG_DH} --jwtkeyfile ${server_key_file} --setdefaultdevhubusername"
+    rc = command "${toolbelt}/sfdx auth:jwt:grant --instanceurl ${SFDC_HOST_DH} --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} --username ${HUB_ORG_DH} --jwtkeyfile ${JWT_CRED_ID_DH} --setdefaultdevhubusername"
     if (rc != 0) {
         error 'Salesforce dev hub org authorization failed.'
     }
@@ -68,4 +77,12 @@ node {
             if (rc != 0) { error 'permset:assign failed'}
         }
 }
+}
+
+def command(script) {
+    if (isUnix()) {
+        return sh(returnStatus: true, script: script);
+    } else {
+        return bat(returnStatus: true, script: script);
+    }
 }
