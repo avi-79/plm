@@ -15,19 +15,6 @@ node {
 
     def toolbelt = tool 'toolbelt'
 
-    stage('Checkout Source') {
-        // when running in multi-branch job, one must issue this command
-        checkout scm
-    }
-	
- #stage('Souce Code Analysis'){
-	 
- bat "sonar-scanner.bat \
-  -Dsonar.projectKey=salesforce-DX \
-  -Dsonar.sources=. \
-  -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.login=jenkins-sonar"
- }#
 	
     	stage('Authenticate Devhub') {
             bat "sfdx force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} \
