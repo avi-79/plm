@@ -39,7 +39,7 @@ node {
     // JWT key credentials.
     // ----
       withCredentials([file(credentialsId: JWT_KEY_CRED_ID, variable: 'jwt_key_file')]) {
-        stage('authorisatiom') {
+        stage('authorizatiom') {
             if (isUnix()) {
                 rc = sh returnStatus: true, script: "${toolbelt} force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY} --username ${HUB_ORG} --jwtkeyfile ${jwt_key_file} --setdefaultdevhubusername --instanceurl ${SFDC_HOST}"
             }else{
@@ -59,7 +59,7 @@ node {
 
                 
         stage('Push To Test Scratch Org') {
-              rc = bat returnStatus: true, script: "\"${toolbelt}\" force:source:push --targetusername ${alias}"
+              rc = bat returnStatus: true, script: "\"${toolbelt}\" force:source:push --targetusername avinesh17@force.com"
               println(rc)
               if (rc != 0) {
               error 'Salesforce push to test scratch org failed.'
