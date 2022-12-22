@@ -6,36 +6,44 @@ node {
     def RUN_ARTIFACT_DIR="tests/${BUILD_NUMBER}"
     def SFDC_USERNAME
 
-    def HUB_ORG_DH="avinesh17@force.com"
-    def SFDC_HOST_DH = "https://login.salesforce.com"
-    def JWT_CRED_ID_DH = env.JWT_CRED_ID_DH
-    def CONNECTED_APP_CONSUMER_KEY_DH="3MVG9n_HvETGhr3B6A3.exf_Yzlw3t8b7ifS4x8DMPFTXx6tG9fXnE5zdUCuDqVVur950EbWfVi7L4ymGiqO2"
-    
+    def HUB_ORG=env.HUB_ORG_DH
+    def SFDC_HOST = env.SFDC_HOST_DH
+    def JWT_KEY_CRED_ID = env.JWT_CRED_ID_DH
+    def CONNECTED_APP_CONSUMER_KEY=env.CONNECTED_APP_CONSUMER_KEY_DH
+
+    println 'KEY IS' 
+    println JWT_KEY_CRED_ID
+    println HUB_ORG
+    println SFDC_HOST
+    println CONNECTED_APP_CONSUMER_KEY
+    def toolbelt = tool 'toolbelt'
+
     
 
-    def toolbelt = tool 'toolbelt'
  stage('Checkout Source') {
         // when running in multi-branch job, one must issue this command
         checkout scm
     }
-	
-    	stage('Authenticate Devhub') {
-            bat "sfdx force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} \
---jwtkeyfile server.key --username ${HUB_ORG_DH} \
---setdefaultdevhubusername --setalias myhuborg"
-        }
+		
+		stage('Authorize DevHub') {   
+    rc = command "${toolbelt}/sfdx auth:jwt:grant --instanceurl ${SFDX_HOST_DH} --clientid ${CONNECTED_APP_CONSUMER_KEY_DH} --username ${HUB_ORG_DH} --jwtkeyfile ${server_key_file} --setdefaultdevhubusername --setalias HubOrg"
+    if (rc != 0) {
+        error 'Salesforce dev hub org authorization failed.'
+    }
+  }
         
-        stage('Create Scratch Org') {
-            // need to pull out assigned username
-            rmsg = bat returnStdout: true, script: "\"${toolbelt}\" force:org:create -f config/project-scratch-def.json --json -s -a QAUbuntu"
-            println(rmsg)
+  
+		
+		stage('Create Test Scratch Org') {
+    rc = command "${toolbelt}/sfdx force:org:create --targetdevhubusername HubOrg --setdefaultusername --definitionfile config/project-scratch-def.json --setalias ciorg --wait 10 --durationdays 1"
+    println(rmsg)
             def jsonSlurper = new JsonSlurperClassic()
             def robj = jsonSlurper.parseText(rmsg)
             if (robj.status != 0) { error 'org creation failed: ' + robj.message }
             SFDC_USERNAME=robj.result.username
             println(SFDC_USERNAME)
             robj = null
-        }
+}
 
     	stage('Set Default Scratch Org') {
             rc = bat returnStatus: true, script: "\"${toolbelt}\" force:config:set --global defaultusername=${SFDC_USERNAME} --json"
@@ -43,7 +51,7 @@ node {
         }
 
         stage('Create password for scratch org') {
- 			rmsg = bat returnStdout: true, script: "\"${toolbelt}\" force:user:password:generate --json"
+ 			rc = command returnStdout: true, script: "\"${toolbelt}\" force:user:password:generate --json"
 			println(rmsg)
 			def jsonSlurper = new JsonSlurperClassic()
 			def robj = jsonSlurper.parseText(rmsg)
@@ -52,7 +60,7 @@ node {
         }
 	
         stage('Push To Scratch Org') {
-            rc = bat returnStatus: true, script: "\"${toolbelt}\" force:source:push --targetusername ${SFDC_USERNAME}"
+            rc = command returnStatus: true, script: "\"${toolbelt}\" force:source:push --targetusername ${SFDC_USERNAME}"
             if (rc != 0) { error 'Push failed'}	
             // assign permset
             rc = sh returnStatus: true, script: "\"${toolbelt}\" force:user:permset:assign --targetusername ${SFDC_USERNAME} --permsetname purealoe"
