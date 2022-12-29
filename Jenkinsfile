@@ -37,7 +37,8 @@ node {
   -Dsonar.projectKey=salesforce-DX \
   -Dsonar.sources=. \
   -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.login=57fde70b-fe3c-4ac7-ba91-918bad6acde6"
+  -Dsonar.login=f3421ab5-fb20-45fd-866b-595079c232f4"
+  
  }
 
  
